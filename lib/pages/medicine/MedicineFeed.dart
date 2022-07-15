@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medline/pages/medicine/MedicineState.dart';
 
+import '../../core/app_colors.dart';
+import '../../core/widgets/app_floating_action_button.dart';
+
 class MedicineFeed extends StatelessWidget {
   const MedicineFeed({Key? key}) : super(key: key);
 
@@ -11,7 +14,11 @@ class MedicineFeed extends StatelessWidget {
     return Scaffold(
         backgroundColor: const Color(0xff151515),
         body: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.only(
+              right: 16,
+              left: 16,
+              bottom: 16,
+            ),
             child: ListView(physics: const BouncingScrollPhysics(), children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -56,16 +63,17 @@ class MedicineFeed extends StatelessWidget {
                 ),
               )
             ])),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PostInMedicine()));
-          },
-          child: Icon(
-            Icons.edit_outlined,
-            color: Colors.black,
-          ),
-          backgroundColor: Colors.white,
-        ));
+      floatingActionButton: AppFloatingActionButton(
+        icon: const Icon(Icons.edit, color: AppColors.background),
+        action: () {
+          // TODO: implement
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (BuildContext context) => const PostInMedicine()),
+          );
+        },
+      ),
+    );
   }
 }
 

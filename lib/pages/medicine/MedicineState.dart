@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+
+import '../../core/api/mutations.dart';
+import '../categories/categories.dart';
 
 class PostInMedicine extends StatefulWidget {
     const PostInMedicine({Key? key}) : super(key: key);
@@ -17,7 +21,7 @@ class _PostInMedicineState extends State<PostInMedicine> {
       backgroundColor: const Color(0xff151515),
       appBar: AppBar(
         backgroundColor: const Color(0xff151515),
-        title: const Text('Together' , style: TextStyle(color: Colors.green,fontSize: 25),),
+        title: const Text('Medline' , style: TextStyle(color: Colors.green,fontSize: 25),),
         centerTitle: true,
         elevation: 0.0,
       ),
@@ -39,7 +43,7 @@ class _PostInMedicineState extends State<PostInMedicine> {
                 setState(() {
                   type= value;
                 });
-              },),
+              }, textHint: 'Type',),
 
 
               const SizedBox(height: 20,),
@@ -58,11 +62,31 @@ class _PostInMedicineState extends State<PostInMedicine> {
               ),
 
               const SizedBox(height: 60,),
-               CustomButton(
-                onTap: (){
-                  //TODO: post function
-                  // all you need is type & locationController.text
-                },
+              Mutation(
+                  options: MutationOptions(
+                    document: gql(Mutations.createMedicinePost()),
+                    // or do something with the result.data on completion
+                    onCompleted: (dynamic resultData) {
+                      if (resultData != null) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CategoriesPage(),
+                          ),
+                        );
+                      }
+                    },
+                    onError: (OperationException? error) {
+                      print(error);
+                    },
+                  ),
+                  builder: (RunMutation runMutation, QueryResult? result) =>
+                      CustomButton(
+                        onTap: () {
+                          // if (phoneController.value.text != '') {
+                          //   runMutation({
+                          //   });
+                          },
+                      )
               ),
             ],
           ),
@@ -96,10 +120,11 @@ class CustomButton extends StatelessWidget {
 
 
 class CustomDropDown extends StatelessWidget {
-  CustomDropDown({Key? key ,this.onChanged,this.value}) : super(key: key);
+  CustomDropDown({Key? key ,this.onChanged,this.value,required this.textHint}) : super(key: key);
   final List<String> types = ['A+', 'A-', 'B+', 'B-', 'AB+','AB-' , 'O+' , 'O-'];
   final void Function(String?)? onChanged;
   final String? value;
+  final String? textHint;
   @override
   Widget build(BuildContext context) {
     return  Container(
@@ -115,7 +140,7 @@ class CustomDropDown extends StatelessWidget {
           color: Colors.transparent,
         ),
         alignment: AlignmentDirectional.centerEnd,
-        hint: const Text('Type',style: TextStyle(color: Colors.grey),),
+        hint:  Text('$textHint',style: const TextStyle(color: Colors.grey),),
         value: value,
         dropdownColor: Colors.black,
         items: types.map<DropdownMenuItem<String>>((String value) {

@@ -3,11 +3,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:medline/core/app_colors.dart';
 import 'package:medline/core/widgets/app_logo.dart';
 import 'package:medline/core/widgets/authentication_text_field.dart';
-import 'package:medline/core/widgets/next_button.dart';
-import 'package:medline/pages/categories/categories.dart';
-import 'package:medline/pages/login/confirmation.dart';
-import 'package:medline/pages/login/login_page.dart';
-import 'package:medline/pages/medicine/MedicineFeed.dart';
+import 'package:medline/pages/profile/profile.dart';
 import 'package:medline/pages/register/widgets/registration_agreement/widgets/registration_agreement.dart';
 import 'package:medline/pages/register/widgets/registration_agreement/registration_agreement_text.dart';
 import 'package:medline/pages/register/widgets/registration_agreement/widgets/registration_check_box.dart';
@@ -85,14 +81,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 46),
                 Mutation(
                   options: MutationOptions(
-                      document: gql(Mutations.registerUser(nameController.value.text, widget.phoneNumber, widget.confirmationCode )),
+                      document: gql(Mutations.registerUser()),
                      //document: gql(Mutations.registerUser(name, widget.phoneNumber, widget.confirmationCode)),
                     // or do something with the result.data on completion
                     onCompleted: (dynamic resultData) {
                       if (resultData != null) {
-                        print(resultData['register']['accessToken']);
+                        print(resultData);
                         // saveUserAccessToken(resultData['register']['accessToken']);
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CategoriesPage()));
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => Profile(accessToken: resultData['register']['accessToken'])));
                       }
                     },
                     onError: (OperationException? error) {
@@ -103,8 +99,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       InkWell(
                         borderRadius: BorderRadius.circular(20),
                         onTap: () {
-                          if(widget.phoneNumber != '' && widget.confirmationCode != ''){
+                          if(nameController.value.text !='' && widget.phoneNumber != '' && widget.confirmationCode != ''){
                             runMutation({
+                              'name': nameController.value.text,
                               'phoneNumber': '+2' + widget.phoneNumber,
                               'confirmationCode': widget.confirmationCode
                             });

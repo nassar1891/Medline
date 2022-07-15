@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:medline/pages/medicine/MedicineFeed.dart';
 import 'package:medline/pages/disabilities/DisabilitiesFeed.dart';
@@ -13,62 +14,55 @@ class CategoriesPage extends StatefulWidget {
 }
 
 class _CategoriesPageState extends State<CategoriesPage> {
+  int currentIndex = 0;
+  final screens = [
+    const Center(child: DonationsFeed()),
+    const Center(child: MedicineFeed()),
+    const Center(child: DisabilitiesFeed()),
+
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff151515),
-      appBar: AppBar(
-        backgroundColor: const Color(0xff151515),
-        title: const Text(
-          'Categories',
-          style: TextStyle(color: Colors.green, fontSize: 25),
-        ),
-        centerTitle: true,
-        elevation: 0.0,
-      ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(
-              height: 30,
-            ),
+      // appBar: AppBar(
+      //   backgroundColor: const Color(0xff151515),
+      //   title: const Text(
+      //     'Medline',
+      //     style: TextStyle(color: Colors.green, fontSize: 25),
+      //   ),
+      //   centerTitle: true,
+      //   elevation: 0.0,
+      // ),
+      body: screens[currentIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.black,
+          selectedItemColor: Colors.green,
+          selectedFontSize: 20,
 
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const DonationsFeed()));
-                },
-                child: const Text(
-                  'Donation',
-                  style: TextStyle(color: Colors.green),
-                )
-            ),
+          unselectedItemColor: Colors.blueGrey,
+          unselectedFontSize: 15,
 
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const MedicineFeed()));
-                },
-                child: const Text(
-                  'Medicine',
-                  style: TextStyle(color: Colors.green),
-                )
+          currentIndex: currentIndex,
+          onTap: (index) => setState(() => currentIndex = index),
+          items:const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bloodtype),
+              label: 'Donations',
+              backgroundColor: Colors.black
             ),
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const DisabilitiesFeed()));
-                },
-                child: const Text(
-                  'Disabilities',
-                  style: TextStyle(color: Colors.green),
-                )
+            BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.capsule_fill),
+                label: 'Medicine',
+                backgroundColor: Colors.black
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.wheelchair_pickup_outlined),
+                label: 'Disabilities',
+                backgroundColor: Colors.black
             ),
           ],
-        ),
-      ),
+        )
     );
   }
 }

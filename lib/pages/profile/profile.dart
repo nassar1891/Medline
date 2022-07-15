@@ -1,13 +1,35 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:medline/core/api/mutations.dart';
+import 'package:image_picker/image_picker.dart';
 
 // ignore: must_be_immutable
-class Profile extends StatelessWidget {
-  const Profile({Key? key}) : super(key: key);
+class Profile extends StatefulWidget {
+  final String accessToken;
 
+  const Profile({required  this.accessToken,Key? key}) : super(key: key);
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  File? image;
+
+  Future pickImage()async{
+    try{
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if(image==null) return;
+      final imageTemp = File(image.path);
+      setState(() => this.image = imageTemp);
+    } on PlatformException catch(e){
+      print("failed to pick image: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     var deviceHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
         backgroundColor: const Color(0xff151515),
         extendBodyBehindAppBar: true,
@@ -23,25 +45,35 @@ class Profile extends StatelessWidget {
                 ),
                IconButton(
                  onPressed: (){
-                   //TODO: settings button
+                   Mutations.logout();
                  },
-                 icon: const Icon(Icons.settings , color: Colors.white,),
+                 icon: const Icon(Icons.settings , color: Colors.white,)
                )
               ],
             ),
             const SizedBox(height: 15),
-            Align(
-              child: InkWell(
-                onTap: () {
-                  //Todo : change profile picture
-                },
-                child: const CircleAvatar(
-                  backgroundImage: AssetImage("images/person.png"),
-                  backgroundColor: Colors.blueGrey,
-                  radius: 50,
-                  // maxRadius: 200.0,
+            Column(
+              children: [
+                InkWell(
+                  onTap: () {
+                    pickImage();
+                  },
+                  child: image!= null?
+                  ClipOval(
+                    child: Image.file(
+                        image!,
+                    width: 160,
+                    height: 160,
+                    fit: BoxFit.cover,
+                    ),
+                  )
+                      :const CircleAvatar(
+                    radius: 80,
+                    child: Icon(Icons.camera_alt_outlined),
+
+                  )
                 ),
-              ),
+              ],
             ),
             const SizedBox(height: 10),
             const Center(

@@ -4,7 +4,7 @@ import 'package:medline/core/models/donation_post.dart';
 import 'package:medline/core/models/user.dart';
 import 'package:medline/core/widgets/app_floating_action_button.dart';
 import 'package:medline/core/widgets/page_bar.dart';
-import 'package:medline/pages/disabilities/DisabilitiesFeed.dart';
+import 'package:medline/pages/donations/DonationState.dart';
 import 'package:medline/pages/donations/widgets/donation_post_card.dart';
 import '../../core/app_colors.dart';
 
@@ -21,7 +21,7 @@ class DonationsFeed extends StatelessWidget {
           // TODO: implement
           Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (BuildContext context) => const DisabilitiesFeed()),
+                builder: (BuildContext context) => const PostInDonation()),
           );
         },
       ),

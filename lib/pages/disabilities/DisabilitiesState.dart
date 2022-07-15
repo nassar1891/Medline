@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
   import 'package:medline/pages/medicine/MedicineState.dart';
+
+import '../../core/api/mutations.dart';
+import '../categories/categories.dart';
 
 class PostInDisabilities extends StatefulWidget {
   const PostInDisabilities({Key? key}) : super(key: key);
@@ -68,9 +72,37 @@ class _PostInDisabilitiesState extends State<PostInDisabilities> {
               ),
 
               const SizedBox(height: 60,),
-              CustomButton(
-                onTap: (){
-                },
+              Mutation(
+                  options: MutationOptions(
+                    document: gql(Mutations.createDonationPost()),
+                    // or do something with the result.data on completion
+                    onCompleted: (dynamic resultData) {
+                      if (resultData != null) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CategoriesPage(),
+                          ),
+                        );
+                      }
+                    },
+                    onError: (OperationException? error) {
+                      print(error);
+                    },
+                  ),
+                  builder: (RunMutation runMutation, QueryResult? result) =>
+                      CustomButton(
+                        onTap: () {
+                          if (locationController.value.text != '') {
+                            runMutation({
+                              'accessToken': 'String',
+                              'content': commentController.value.text,
+                              'address': locationController.value.text,
+                              'location': '456.4896',
+                              'showPhoneNumber': ''
+                            });
+                          }
+                         },
+                      )
               ),
             ],
           ),

@@ -5,7 +5,6 @@ import 'package:medline/core/widgets/authentication_text_field.dart';
 import 'package:medline/core/widgets/next_button.dart';
 import 'package:medline/pages/login/confirmation.dart';
 import 'package:medline/pages/login/widgets/login_message.dart';
-import 'package:medline/pages/profile/profile.dart';
 import 'package:medline/core/api/mutations.dart';
 
 import '../../core/widgets/app_logo.dart';
@@ -36,7 +35,7 @@ class LoginPage extends StatelessWidget {
                 const SizedBox(height: 31),
                 Mutation(
                     options: MutationOptions(
-                      document: gql(Mutations.sendSMS(phoneController.value.text)),
+                      document: gql(Mutations.sendSMS()),
                       // or do something with the result.data on completion
                       onCompleted: (dynamic resultData) {
                         if (resultData != null) {
@@ -63,7 +62,8 @@ class LoginPage extends StatelessWidget {
                               });
                             }
                           },
-                        )),
+                        )
+                ),
               ],
             ),
           ),

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:medline/pages/categories/categories.dart';
 import 'package:medline/pages/medicine/MedicineState.dart';
+
+import '../../core/api/mutations.dart';
 
 
 class PostInDonation extends StatefulWidget {
@@ -11,6 +15,9 @@ class PostInDonation extends StatefulWidget {
 
 class _PostInDonationState extends State<PostInDonation> {
   String? type;
+  String? bloodType;
+  final List<String> types = ['request','offer'];
+
   TextEditingController locationController = TextEditingController();
   TextEditingController commentController = TextEditingController();
   TextEditingController numOfDonatorsController = TextEditingController();
@@ -34,17 +41,48 @@ class _PostInDonationState extends State<PostInDonation> {
               const SizedBox(height: 40,),
 
               const Text('Create a post for your case!' ,style: TextStyle(color: Colors.white,fontSize: 20),),
-              const SizedBox(height: 70,),
+              const SizedBox(height: 30,),
 
               CustomDropDown(
-                value: type,
+                value: bloodType,
                 onChanged: (value){
                   setState(() {
-                    type= value;
+                    bloodType= value;
                   });
-                },),
+                }, textHint: 'Blood Type',),
 
 
+              const SizedBox(height: 15,),
+              Container(
+                color: Colors.white10,
+                padding: const EdgeInsets.only(left: 10),
+                child: DropdownButton(
+                  focusColor: Colors.white10,
+                  iconDisabledColor: Colors.white10,
+                  iconEnabledColor: Colors.white10,
+                  isExpanded: true,
+                  underline: Container(
+                    height: 0,
+                    color: Colors.transparent,
+                  ),
+                  alignment: AlignmentDirectional.centerEnd,
+                  hint:  const Text('Type',style: TextStyle(color: Colors.grey),),
+                  value: type,
+                  dropdownColor: Colors.black,
+                  items: types.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value, style: const TextStyle(color: Colors.green),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      type = value as String?;
+                    });
+                  }
+                  ),
+              ),
               const SizedBox(height: 15,),
 
               TextFormField(
@@ -62,22 +100,7 @@ class _PostInDonationState extends State<PostInDonation> {
               const SizedBox(height: 15,),
 
               TextFormField(
-                controller: numOfDonatorsController,
-                style: const TextStyle(color: Colors.green),
-                decoration: const InputDecoration(
-                    border:InputBorder.none,
-                    hintText: 'num of donators',
-                    hintStyle: TextStyle(color:Colors.grey),
-                    hintTextDirection: TextDirection.ltr,
-                    filled: true,
-                    fillColor: Colors.white10
-                ),
-              ),
-
-              const SizedBox(height: 15,),
-
-              TextFormField(
-                maxLines:5,
+                maxLines:4,
                 controller: commentController,
                 style: const TextStyle(color: Colors.green),
                 decoration: const InputDecoration(
@@ -91,10 +114,39 @@ class _PostInDonationState extends State<PostInDonation> {
                 ),
               ),
 
-              const SizedBox(height: 50,),
-              CustomButton(
-                onTap: (){
-                },
+              const SizedBox(height: 30,),
+              Mutation(
+                  options: MutationOptions(
+                    document: gql(Mutations.createDonationPost()),
+                    // or do something with the result.data on completion
+                    onCompleted: (dynamic resultData) {
+                      if (resultData != null) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CategoriesPage(),
+                          ),
+                        );
+                      }
+                    },
+                    onError: (OperationException? error) {
+                      print(error);
+                    },
+                  ),
+                  builder: (RunMutation runMutation, QueryResult? result) =>
+                      CustomButton(
+                        onTap: () {
+                          if (commentController.value.text!='') {
+                            runMutation({
+                              'accessToken': '',
+                              'content': commentController.value.text,
+                              'address': locationController.value.text,
+                              'bloodType': bloodType,
+                              'type': type,
+                              'showPhoneNumber': ''
+                            });
+                          }
+                        },
+                      )
               ),
             ],
           ),

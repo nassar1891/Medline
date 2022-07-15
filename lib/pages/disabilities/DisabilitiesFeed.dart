@@ -4,6 +4,7 @@ import 'package:medline/core/models/disability_post.dart';
 import 'package:medline/core/models/user.dart';
 import 'package:medline/core/widgets/app_floating_action_button.dart';
 import 'package:medline/core/widgets/page_bar.dart';
+import 'package:medline/pages/disabilities/DisabilitiesState.dart';
 import 'package:medline/pages/disabilities/widgets/disability_post_card.dart';
 import '../../core/app_colors.dart';
 
@@ -18,6 +19,10 @@ class DisabilitiesFeed extends StatelessWidget {
         icon: const Icon(Icons.edit, color: AppColors.background),
         action: () {
           // TODO: implement
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (BuildContext context) => const PostInDisabilities()),
+          );
         },
       ),
       body: SafeArea(

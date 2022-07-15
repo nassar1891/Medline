@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:medline/pages/categories/categories.dart';
 import 'package:medline/pages/medicine/MedicineFeed.dart';
+import 'package:medline/pages/profile/profile.dart';
 import 'package:medline/pages/register/register_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medline/core/api/mutations.dart';
 import '../../core/widgets/authentication_text_field.dart';
+import '../../core/widgets/next_button.dart';
 
 class ConfirmationScreen extends StatefulWidget {
   final String phoneNumber;
   final String operation;
 
-  const ConfirmationScreen({ required this.phoneNumber,required this.operation, Key? key})
+  const ConfirmationScreen(
+      {required this.phoneNumber, required this.operation, Key? key})
       : super(key: key);
 
   @override
@@ -28,7 +31,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var deviceWidth = MediaQuery.of(context).size.width;
+    var deviceWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Scaffold(
       backgroundColor: const Color(0xff151515),
       appBar: AppBar(
@@ -45,77 +51,92 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(
-              height: 30,
+          const SizedBox(
+          height: 30,
+        ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: deviceWidth * .1),
+            child: const Text(
+              'Verify your phone number, fill in the code',
+              style: TextStyle(color: Colors.white, fontSize: 22),
+              textAlign: TextAlign.center,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: deviceWidth * .1),
-              child: const Text(
-                'Verify your phone number, fill in the code',
-                style: TextStyle(color: Colors.white, fontSize: 22),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Didn't receive a code?",
+                style: TextStyle(color: Colors.white, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
+              TextButton(
+                  onPressed: () {
+                    //TODO  : resend code button
+                  },
+                  child: const Text(
+                    'Resend Code.',
+                    style: TextStyle(color: Colors.green),
+                  )),
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          AuthenticationTextField(
+            hint: 'Confirmation Code',
+            controller: confirmationCode,
+            keyboardType: TextInputType.phone,
+            maxLength: 13,
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Mutation(
+            options: MutationOptions(
+              document: gql(Mutations.loginUser()),
+              onCompleted: (dynamic resultData) {
+                if (resultData != null) {
+                  print(resultData);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) =>
+                          Profile(
+                              accessToken: resultData['login']
+                              ['accessToken'])));
+                }
+              },
+              onError: (OperationException? error) {
+                print(error);
+              },
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Didn't receive a code?",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                TextButton(
-                    onPressed: () {
-                      //TODO  : resend code button
-                    },
-                    child: const Text(
-                      'Resend Code.',
-                      style: TextStyle(color: Colors.green),
-                    )
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            AuthenticationTextField(
-              hint: 'Confirmation Code',
-              controller: confirmationCode,
-              keyboardType: TextInputType.phone,
-              maxLength: 13,
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-            TextButton(
-                onPressed: () {
-
-                  if(widget.operation == 'register'){
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => RegisterPage(phoneNumber: widget.phoneNumber,
-                            confirmationCode: confirmationCode.value.text)));
-                  }
-                  else{
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => const CategoriesPage()));
-                  }
-
-                    },
-                child: const Text(
-                  'CONFIRM',
-                  style: TextStyle(color: Colors.green),
-                )),
-          ],
-        ),
+            builder:
+                (RunMutation runMutation, QueryResult? result) =>
+                NextButton(
+                  action: () {
+                    if (widget.operation == 'register') {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => RegisterPage(
+                              phoneNumber: widget.phoneNumber,
+                              confirmationCode: confirmationCode.value.text)));
+                    }
+                    else{
+                      runMutation({
+                        'phoneNumber': '+2' + widget.phoneNumber,
+                        'confirmationCode': confirmationCode.value.text
+                      });
+                    }
+                  },
+                )
+        )
+        ],
       ),
-    );
+    ),);
   }
 
   Widget _buildCodeNumberBox(String codeNumber) {
@@ -148,6 +169,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
 
 class NumericBad extends StatelessWidget {
   final Function(int) onNumberSelected;
+
   const NumericBad({Key? key, required this.onNumberSelected})
       : super(key: key);
 
@@ -158,7 +180,10 @@ class NumericBad extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.11,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.11,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +195,10 @@ class NumericBad extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.11,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.11,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +210,10 @@ class NumericBad extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.11,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.11,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +225,10 @@ class NumericBad extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.11,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.11,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
